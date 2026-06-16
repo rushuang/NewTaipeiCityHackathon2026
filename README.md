@@ -3,12 +3,6 @@
 Analyze topics from 2 dimensions: scope and member ability
 by Ru's Gemini
 
-# 2026 新北市 AI 智慧城市黑客松競賽 - 5大主題 SWOT 戰略分析報告
-
-本文件針對「2026 新北市 AI 智慧城市黑客松競賽」所提出的 5 大智慧城市命題，結合各局處之行政現況、核心痛點、AWS 雲端與 AI 技術支持（Generative AI & Agentic AI），進行全方位的 SWOT 戰略分析，旨在提供團隊內部評估、技術選型與商業包裝之決策依據。
-
----
-
 ## 📌 目錄
 1. [AI 輔助不動產估價案件審查（地政局）](#1-ai-輔助不動產估價案件審查地政局)
 2. [YouBike 智慧調度（交通局）](#2-youbike-智慧調度交通局)
