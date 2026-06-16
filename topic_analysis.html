@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 新北市 AI 智慧城市黑客松 - 戰略分析簡報</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+            background-color: #0b0f19;
+        }
+        .slide-enter {
+            opacity: 0;
+            transform: scale(0.98) translateY(10px);
+        }
+        .slide-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glassmorphism {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px rgba(255, 255, 255, 0.08) solid;
+        }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col justify-between overflow-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="glassmorphism border-b border-zinc-800 px-6 py-4 flex flex-wrap items-center justify-between z-10">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-r from-indigo-500 to-violet-600 p-2 rounded-lg text-white shadow-lg">
+                <i class="fa-solid fa-microchip text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-violet-400">新北 AI 智慧城市黑客松</h1>
+                <p class="text-xs text-gray-400 font-mono">AWS Tech-Support Campaign Strategy</p>
+            </div>
+        </div>
+
+        <!-- Slide Deck Switcher -->
+        <div class="flex bg-zinc-900/90 p-1.5 rounded-xl border border-zinc-800 my-2 sm:my-0">
+            <button onclick="switchDeck(1)" id="deck-tab-1" class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md">
+                <i class="fa-solid fa-chart-line mr-2"></i>主題發揮空間排序
+            </button>
+            <button onclick="switchDeck(2)" id="deck-tab-2" class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-users-gear mr-2"></i>團隊適合度排序
+            </button>
+        </div>
+
+        <!-- Help Info -->
+        <div class="hidden md:flex items-center space-x-4 text-xs text-gray-400 font-mono">
+            <span><kbd class="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-300">←</kbd> <kbd class="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-300">→</kbd> 切換</span>
+            <span class="h-4 w-px bg-zinc-800"></span>
+            <span>2026 智慧城市競賽</span>
+        </div>
+    </header>
+
+    <!-- Main Slides Container -->
+    <main class="flex-grow flex items-center justify-center p-4 md:p-8 relative">
+        <div id="slide-wrapper" class="w-full max-w-5xl aspect-[16/10] md:aspect-[16/9] glassmorphism rounded-3xl shadow-2xl shadow-indigo-950/20 p-6 md:p-12 flex flex-col justify-between relative overflow-hidden slide-active">
+            
+            <!-- Dynamic Slide Content Injection -->
+            <div id="slide-content" class="flex-grow flex flex-col justify-between h-full">
+                <!-- Content will be injected here via JavaScript -->
+            </div>
+
+            <!-- Glow Effect Orbs -->
+            <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        </div>
+    </main>
+
+    <!-- Bottom Controller Footer -->
+    <footer class="glassmorphism border-t border-zinc-800 px-6 py-4 flex items-center justify-between z-10">
+        <div class="text-xs md:text-sm text-gray-400 font-mono">
+            投影片 <span id="current-slide-num" class="text-indigo-400 font-bold">1</span> / <span id="total-slides-num">7</span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="flex-grow mx-8 max-w-md hidden md:block bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+            <div id="slide-progress" class="bg-gradient-to-r from-indigo-500 to-violet-600 h-full transition-all duration-300" style="width: 14.28%;"></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center space-x-3">
+            <button onclick="prevSlide()" class="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 active:scale-95 text-white rounded-xl transition-all h-10 w-10 flex items-center justify-center shadow">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button onclick="nextSlide()" class="p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 active:scale-95 text-white rounded-xl transition-all h-10 w-10 flex items-center justify-center shadow">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- JS Slide Configuration & Logics -->
+    <script>
+        let currentDeck = 1;
+        let currentSlide = 0;
+
+        // Slide Data Definition
+        const decks = {
+            1: [
+                // DECK 1 - Slide 1 (Title)
+                {
+                    type: "title",
+                    title: "2026新北市AI智慧城市黑客松",
+                    subtitle: "主題開發與發揮空間排行指南",
+                    desc: "以創意的落地可行性、技術深度亮點、痛點直擊度為三大指標",
+                    badge: "DECK 1：主題發揮空間",
+                    icon: "fa-rocket"
+                },
+                // DECK 1 - Slide 2 (Top 1)
+                {
+                    type: "content",
+                    rank: "🥇 Top 1",
+                    topic: "教保機構風險監測（教育局）",
+                    suitability: "發揮空間：★★★★★ (極大)",
+                    why: "這是一道結合「大數據 × 輿情 × 風險預測」的黃金社會價值題。極易在黑客松建立吸睛的『預警儀表板 (Dashboard)』，在 Demo 階段視覺效果拔群，最容易打動評審。",
+                    techList: [
+                        { name: "NLP 情感分析", desc: "社群、論壇黑水文本反諷與負面情緒識別 (如 Amazon Comprehend)" },
+                        { name: "異常檢測演算法", desc: "財務、裁罰、評鑑交叉比對 (如 Isolation Forest, SageMaker)" },
+                        { name: "動態地圖視覺化", desc: "將風險層級以地圖警示燈呈現 (Streamlit / D3.js)" }
+                    ],
+                    metrics: { complexity: 85, impact: 95, aws: 90 }
+                },
+                // DECK 1 - Slide 3 (Top 2)
+                {
+                    type: "content",
+                    rank: "🥈 Top 2",
+                    topic: "青年資料AI整合（青年局）",
+                    suitability: "發揮空間：★★★★☆ (大)",
+                    why: "迎合《青年基本法》三讀通過政策，政治與社會正確性高。雖然跨機關異質資料清洗門檻極高，但成功串接並能以知識圖譜提供『起薪與趨勢關聯預測』者必奪高分。",
+                    techList: [
+                        { name: "大數據 ETL 引擎", desc: "清洗格式混亂的 API、CSV、掃描檔 (利用 AWS Glue / Athena)" },
+                        { name: "圖資料庫與關係分析", desc: "建立青年學經歷與職缺的『知識圖譜』(Amazon Neptune)" },
+                        { name: "時序與迴歸預測", desc: "推估未來青年創業與就業趨勢 (SageMaker / XGBoost)" }
+                    ],
+                    metrics: { complexity: 90, impact: 85, aws: 85 }
+                },
+                // DECK 1 - Slide 4 (Top 3)
+                {
+                    type: "content",
+                    rank: "🥉 Top 3",
+                    topic: "YouBike 智慧調度（交通局）",
+                    suitability: "發揮空間：★★★★☆ (大，但競爭慘烈)",
+                    why: "數據極為完整、通勤痛點直覺。然而，因為這是資料科學傳統經典題，各路高手皆有備而來。想脫穎而出，必須在『即時外部天氣/捷運變數融合』與『調度路線規劃』展現演算法創新。",
+                    techList: [
+                        { name: "時間序列預測", desc: "精準預測各站點租借與歸還供需 (LSTM / Prophet / DeepAR)" },
+                        { name: "時空數據處理 (GIS)", desc: "處理地理座標與群聚效應 (Geopandas / Uber H3)" },
+                        { name: "運籌最佳化演算法", desc: "自動規劃最省時/最省人力的調度路線 (Google OR-Tools)" }
+                    ],
+                    metrics: { complexity: 95, impact: 80, aws: 80 }
+                },
+                // DECK 1 - Slide 5 (Top 4)
+                {
+                    type: "content",
+                    rank: "🏅 Top 4",
+                    topic: "AI輔助不動產估價審查（地政局）",
+                    suitability: "發揮空間：★★★☆☆ (中等)",
+                    why: "基於『評價因素基準明細表』的合規審查。業務邏輯標準、落地可行性強；然而在黑客松極短時間內，若只做資料核對加總，技術亮點稍顯薄弱，需要用 LLM 深度理解文本語意衝突才夠驚艷。",
+                    techList: [
+                        { name: "文檔智能與 OCR", desc: "多張勘查表、分析表之結構化文字解析 (Amazon Textract)" },
+                        { name: "RAG & LLM 法規檢索", desc: "精準理解與判定估價條件是否滿足法規限制 (Bedrock + Claude)" },
+                        { name: "Schema Matching", desc: "自動化欄位對齊與跨表勾稽檢核演算法" }
+                    ],
+                    metrics: { complexity: 75, impact: 70, aws: 85 }
+                },
+                // DECK 1 - Slide 6 (Top 5)
+                {
+                    type: "content",
+                    rank: "🎖 Top 5",
+                    topic: "訴願流程自動化（法制局）",
+                    suitability: "發揮空間：★★★☆☆ (較受限)",
+                    why: "大宗訴願爭點重複度高（如廢棄物清理、洗錢防制），極適合 RAG 大顯身手。然而法律容錯率為零、案情繁雜，黑客松時間內難以完美解決 LLM 的幻覺問題，評審在公權力自動判決上態度會較保守。",
+                    techList: [
+                        { name: "進階檢索 (Advanced RAG)", desc: "混合檢索 (Hybrid) 與重排技術 (Re-ranking) 以杜絕幻覺" },
+                        { name: "向量資料庫檢索", desc: "儲存龐大歷史訴願決定書與法規函釋 (Amazon OpenSearch)" },
+                        { name: "AI Agents 決策鏈", desc: "自動將長篇訴願書拆解並提出核心法律爭點 (LangChain / LlamaIndex)" }
+                    ],
+                    metrics: { complexity: 80, impact: 75, aws: 90 }
+                },
+                // DECK 1 - Slide 7 (Strategic Summary)
+                {
+                    type: "summary",
+                    title: "黑客松奪冠方程式",
+                    desc: "評審評分焦點：技術落地（完成度） ＞ 炫技無效 ＞ 直擊痛點",
+                    tips: [
+                        { title: "活用 AWS GenAI 特色", text: "評審高度期待看到 AWS Bedrock/SageMaker 工具的融合。利用 API 實現 Serverless 架構，能增加『技術可行性』分數。" },
+                        { title: "建立驚艷的 Live Demo", text: "這是不動的定律。一個能夠一鍵操作、具有漂亮圖表及地圖警示燈號的網頁原型，比一萬行的 Python 程式碼更具說服力。" },
+                        { title: "痛點與政策的連結", text: "簡報須直擊『新北市各局處同仁在日常作業中最大的痛點』，將 AI 塑造成公務員的神隊友。" }
+                    ],
+                    badge: "AWS & AI 智慧城市治理"
+                }
+            ],
+            2: [
+                // DECK 2 - Slide 1 (Title)
+                {
+                    type: "title",
+                    title: "專屬團隊適合度排序",
+                    subtitle: "1 大腦 + 1 快手 + 1 智囊 + 1 企劃",
+                    desc: "避開硬核時序模型短板，發揮 LLM, NLP, 輿情分析與快速 Prototype 優勢",
+                    badge: "DECK 2：團隊黃金戰略",
+                    icon: "fa-users"
+                },
+                // DECK 2 - Slide 2 (Team Analysis)
+                {
+                    type: "team",
+                    title: "🚀 完美互補的團隊戰力盤點",
+                    members: [
+                        { role: "組員 1 (AI科系)", tag: "大腦", desc: "熟悉 NLP / ML、有 Kaggle 評論情感分析經驗。適合規劃 Agent 決策鏈與 Prompts 工程。 Python 熟但需提效。" },
+                        { role: "組員 4 (資工背景)", tag: "快手", desc: "Python 熟手、擅用 Claude Code。擁有網頁、App 與 XR 開發實績。適合負責系統開發與 Demo 快速輸出。" },
+                        { role: "組員 2 (土木背景)", tag: "智囊", desc: "公司黑客松冠軍，極擅長結構化思考、主題資料統整與痛點發掘。負責驗證 Agent 實用性與業務邏輯。" },
+                        { role: "組員 3 (管理行銷)", tag: "企劃", desc: "簡報與企劃常客，長於產業背景與痛點分析、數據蒐集與故事包裝。負責簡報與商業可行性包裝。" }
+                    ]
+                },
+                // DECK 2 - Slide 3 (Suitability 1)
+                {
+                    type: "content",
+                    rank: "🥇 適合度 Top 1",
+                    topic: "教保機構風險監測 (教育局)",
+                    suitability: "適合度：⭐⭐⭐⭐⭐ (完美契合 - 優先推薦！)",
+                    why: "這是一道完美的社會責任題。組員 1 可以無縫複製 Kaggle 情感分析經驗處理『輿情黑水/論壇爆料』；組員 2 負責訂定交叉勾稽邏輯；組員 4 以資工快手優勢快速建立『新北教保風險預警地圖 Demo』；組員 3 進行 ESG 與社會安全故事包裝，完美命中所有人的優勢！",
+                    techList: [
+                        { name: "組員 1 情感模型複製", desc: "將 Tweet 評論分析經驗直接轉換為家長輿情情感分析" },
+                        { name: "組員 2 & 4 勾稽 Agent", desc: "（收費異常 + 輿情不滿）× 鑑識會計 = 自動風險評估" },
+                        { name: "組員 3 商業故事包裝", desc: "主打兒少安全與精準監管，企劃簡報說服力爆表" }
+                    ],
+                    metrics: { complexity: 70, impact: 95, aws: 85 }
+                },
+                // DECK 2 - Slide 4 (Suitability 2)
+                {
+                    type: "content",
+                    rank: "🥈 適合度 Top 2",
+                    topic: "訴願流程自動化 (法制局)",
+                    suitability: "適合度：⭐⭐⭐⭐☆ (高度推薦 - Agent 主場)",
+                    why: "純粹的 LLM 與文字 Agent 主場，完美避開大數據清洗與 GIS 時序等數學地雷。技術著重在 RAG 與 Prompt 的架構，組員 4 可以利用 Claude Code 輔助組員 1（寫 Python 慢）的軟肋，快速疊代出好用的訴願文書助理 Prototype，組員 2 負責把關嚴密的法律邏輯。",
+                    techList: [
+                        { name: "Claude Code 協作開發", desc: "高產出、高效率的 Agent 系統與 UI 部署" },
+                        { name: "RAG 設計 & 爭點比對", desc: "歷史訴願決定書自動切片檢索、自動生成決定書草稿" },
+                        { name: "邏輯結構化（土木RC思考）", desc: "組員 2 將複雜訴願邏輯化繁為簡，轉化為 Agent Workflows" }
+                    ],
+                    metrics: { complexity: 75, impact: 85, aws: 90 }
+                },
+                // DECK 2 - Slide 5 (Suitability 3)
+                {
+                    type: "content",
+                    rank: "🥉 適合度 Top 3",
+                    topic: "AI輔助不動產估價審查 (地政局)",
+                    suitability: "適合度：⭐⭐⭐☆☆ (可以挑戰 - 有資料清洗阻礙)",
+                    why: "組員 2 的土木背景對於土地、地價等專業詞彙有基本認識，能引導技術組。但本題涉及多張表單的比對與對齊，若主辦方提供的是複雜的掃描檔或 PDF，技術組將被迫花費大把時間在苦力活（OCR 欄位清理對齊），會嚴重壓縮組員 1 與組員 4 撰寫 AI 模型與 Agent 的黃金時間。",
+                    techList: [
+                        { name: "領域知識（土木）橋梁", desc: "組員 2 協助理解優劣等級、修正率與嫌惡設施距離等計算" },
+                        { name: "表單對齊與 Schema 整合", desc: "需要克服大量 OCR 資料不對齊與髒資料清洗" },
+                        { name: "RAG 與標準法規判定", desc: "比對地價區段勘查表，自動偵測抄填與計算錯誤" }
+                    ],
+                    metrics: { complexity: 85, impact: 70, aws: 80 }
+                },
+                // DECK 2 - Slide 6 (Suitability 4)
+                {
+                    type: "content",
+                    rank: "4️⃣ 適合度 Top 4",
+                    topic: "青年資料 AI 整合 (青年局)",
+                    suitability: "適合度：⭐⭐⭐☆☆ (商務強/技術重)",
+                    why: "這題是行銷企劃（組員 3）的黃金主場，在起薪、就業、創業等議題上可以給出極其亮眼且大膽的提案。但致命傷在於『技術端髒活太多』，資料極其異質（API、CSV、甚至圖片掃描檔）且定義衝突。對於 Python 寫不快的組員 1 來說，前期的 ETL 清洗壓力會極大，恐沒時間施展 Agent 魔法。",
+                    techList: [
+                        { name: "行銷企劃與分析大展身手", desc: "組員 3 可以給出非常有智慧城市高度的青年政策提案" },
+                        { name: "高強度的 ETL 數據清洗", desc: "需要將中央、地方等不同標準定義的青年數據整合並標準化" },
+                        { name: "數據交叉關聯與分析", desc: "尋找青年教育程度與起薪等跨領域之潛在關聯" }
+                    ],
+                    metrics: { complexity: 90, impact: 80, aws: 75 }
+                },
+                // DECK 2 - Slide 7 (Suitability 5)
+                {
+                    type: "content",
+                    rank: "❌ 適合度 Top 5",
+                    topic: "YouBike 智慧調度 (交通局)",
+                    suitability: "適合度：⭐⭐☆☆☆ (最不建議 - 技術錯位)",
+                    why: "技術棧與你們團隊嚴重錯位。這題需要高深的『時間序列預測模型（LSTM/DeepAR）』與『運籌調度路線優化演算法（如遺傳演算法）』。雖然組員 4 能刻出漂亮的調度地圖，但你們缺乏專攻傳統機器學習時序與最佳化運籌的隊員，硬碰硬對上其他統計/交管系隊伍，優勢全無，且無法展現組員 1 在 NLP/Agent 與組員 3 商業故事上的才華。",
+                    techList: [
+                        { name: "時序預測短板", desc: "缺乏精通深度時序預測（如 LSTM/Transformer-based）的專家" },
+                        { name: "最佳化演算法限制", desc: "需要處理高複雜度的路網圖論最佳化調度路徑" },
+                        { name: "無法施展核心優勢", desc: "無 LLM 與 Agents 應用空間，組員 1 的 NLP 實戰經驗無法發揮" }
+                    ],
+                    metrics: { complexity: 95, impact: 75, aws: 70 }
+                },
+                // DECK 2 - Slide 8 (Strategy Goal)
+                {
+                    type: "summary",
+                    title: "團隊決戰策略：人人有事做，人人能立功",
+                    desc: "30小時開發時間有限，極速分工、發揮長處是唯一生路",
+                    tips: [
+                        { title: "組員 3 (企劃) 🚀 領跑痛點分析", text: "競賽前 12 小時，完成精緻的 PPT 架構，定義出完美的社會與行政痛點。隨後協助技術團隊搜集輔助數據（如特定輿情、新聞）。" },
+                        { title: "組員 2 (智囊) 📝 定義規則與邏輯", text: "迅速將新北市政府的出題說明，拆解成 AI 可執行的邏輯判斷（IF-THEN / Agent Workflow），成為技術與商業端的堅實橋梁。" },
+                        { title: "組員 1 & 4 (技術) 💻 極速實現 Prototype", text: "組員 1 專攻 AWS Bedrock 接口、Prompt 設計與 Agent 反覆思考鏈；組員 4 藉 Claude Code 提效，火速搭建出有地圖與警示燈的動態網頁 MVP。" }
+                    ],
+                    badge: "新北市黑客松勝利方程式"
+                }
+            ]
+        };
+
+        // Switch Slide Deck logic
+        function switchDeck(deckNum) {
+            currentDeck = deckNum;
+            currentSlide = 0;
+            
+            // UI tabs updates
+            document.getElementById("deck-tab-1").className = deckNum === 1 
+                ? "px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md"
+                : "px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 text-gray-400 hover:text-white";
+            document.getElementById("deck-tab-2").className = deckNum === 2 
+                ? "px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md"
+                : "px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 text-gray-400 hover:text-white";
+
+            renderSlide();
+        }
+
+        function nextSlide() {
+            if (currentSlide < decks[currentDeck].length - 1) {
+                currentSlide++;
+                animateSlideTransition();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                animateSlideTransition();
+            }
+        }
+
+        function animateSlideTransition() {
+            const el = document.getElementById("slide-wrapper");
+            el.classList.remove("slide-active");
+            el.classList.add("slide-enter");
+            setTimeout(() => {
+                renderSlide();
+                el.classList.remove("slide-enter");
+                el.classList.add("slide-active");
+            }, 150);
+        }
+
+        // Main Renderer for slide slides
+        function renderSlide() {
+            const slide = decks[currentDeck][currentSlide];
+            const contentContainer = document.getElementById("slide-content");
+            
+            // Update slide counts
+            document.getElementById("current-slide-num").innerText = currentSlide + 1;
+            document.getElementById("total-slides-num").innerText = decks[currentDeck].length;
+            const progressPct = ((currentSlide + 1) / decks[currentDeck].length) * 100;
+            document.getElementById("slide-progress").style.width = `${progressPct}%`;
+
+            let htmlContent = "";
+
+            if (slide.type === "title") {
+                htmlContent = `
+                    <div class="flex-grow flex flex-col justify-center items-center text-center py-8">
+                        <span class="px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mb-6 tracking-wide uppercase font-mono">${slide.badge}</span>
+                        <div class="bg-gradient-to-br from-indigo-500 to-violet-600 p-5 rounded-3xl text-white shadow-xl mb-6 shadow-indigo-950/40 animate-pulse">
+                            <i class="fa-solid ${slide.icon} text-4xl"></i>
+                        </div>
+                        <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-200 to-zinc-400 mb-4">${slide.title}</h2>
+                        <h3 class="text-xl md:text-2xl text-indigo-300 font-medium mb-6">${slide.subtitle}</h3>
+                        <p class="text-sm md:text-base text-gray-400 max-w-xl font-medium leading-relaxed">${slide.desc}</p>
+                    </div>
+                `;
+            } else if (slide.type === "content") {
+                htmlContent = `
+                    <div class="h-full flex flex-col justify-between">
+                        <!-- Top Row: Title, badge and rank -->
+                        <div class="flex flex-wrap items-center justify-between border-b border-zinc-800/80 pb-4 mb-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3.5 py-1.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-orange-950/20">${slide.rank}</span>
+                                <h3 class="text-lg md:text-2xl font-bold text-white">${slide.topic}</h3>
+                            </div>
+                            <span class="text-xs md:text-sm font-semibold px-3 py-1 bg-zinc-800 text-indigo-300 rounded-lg border border-zinc-700/80 my-2 lg:my-0">${slide.suitability}</span>
+                        </div>
+
+                        <!-- Main Content split in 2 columns -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-grow my-2">
+                            <!-- Left Column: Why this space & Strategy -->
+                            <div class="lg:col-span-7 space-y-4">
+                                <div class="bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800/80">
+                                    <h4 class="text-indigo-400 font-bold text-sm mb-2 uppercase tracking-wide flex items-center">
+                                        <i class="fa-solid fa-lightbulb mr-2 text-indigo-500"></i>為什麼要選這題？ (黑客松視角)
+                                    </h4>
+                                    <p class="text-sm md:text-base text-gray-300 leading-relaxed font-medium">${slide.why}</p>
+                                </div>
+                                <div class="bg-zinc-900/40 p-5 rounded-2xl border border-zinc-800/50">
+                                    <h4 class="text-violet-400 font-bold text-sm mb-3 uppercase tracking-wide flex items-center">
+                                        <i class="fa-solid fa-gears mr-2 text-violet-500"></i>核心所需技術與技術棧
+                                    </h4>
+                                    <ul class="space-y-3">
+                                        ${slide.techList.map(t => `
+                                            <li class="flex items-start text-xs md:text-sm">
+                                                <span class="text-indigo-400 mr-2 mt-0.5"><i class="fa-solid fa-circle-dot text-[8px]"></i></span>
+                                                <div>
+                                                    <strong class="text-zinc-200 font-bold block">${t.name}</strong>
+                                                    <span class="text-gray-400 text-xs">${t.desc}</span>
+                                                </div>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Dashboard Radar Metrics -->
+                            <div class="lg:col-span-5 bg-zinc-900/80 p-6 rounded-2xl border border-zinc-800/80 space-y-5">
+                                <h4 class="text-zinc-300 font-bold text-sm uppercase tracking-wide flex items-center">
+                                    <i class="fa-solid fa-chart-simple mr-2 text-zinc-400"></i>主題難易與效益指標
+                                </h4>
+                                <!-- Complexity Metric -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs font-mono">
+                                        <span class="text-gray-400 font-semibold">技術複雜度 (難度)</span>
+                                        <span class="text-zinc-300 font-bold">${slide.metrics.complexity}%</span>
+                                    </div>
+                                    <div class="bg-zinc-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-gradient-to-r from-indigo-500 to-indigo-400 h-full" style="width: ${slide.metrics.complexity}%"></div>
+                                    </div>
+                                </div>
+                                <!-- Impact Metric -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs font-mono">
+                                        <span class="text-gray-400 font-semibold">評審Demo吸睛度 (效益)</span>
+                                        <span class="text-zinc-300 font-bold">${slide.metrics.impact}%</span>
+                                    </div>
+                                    <div class="bg-zinc-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full" style="width: ${slide.metrics.impact}%"></div>
+                                    </div>
+                                </div>
+                                <!-- AWS Integration -->
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-xs font-mono">
+                                        <span class="text-gray-400 font-semibold">AWS 資源整合容易度</span>
+                                        <span class="text-zinc-300 font-bold">${slide.metrics.aws}%</span>
+                                    </div>
+                                    <div class="bg-zinc-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-gradient-to-r from-violet-500 to-fuchsia-400 h-full" style="width: ${slide.metrics.aws}%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-zinc-800/80 flex items-center justify-between text-xs text-gray-500 font-mono">
+                                    <span>智慧數據 & 智慧治理</span>
+                                    <span>2026 Hackathon</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (slide.type === "team") {
+                htmlContent = `
+                    <div class="h-full flex flex-col justify-between">
+                        <div class="border-b border-zinc-800 pb-4 mb-4">
+                            <h3 class="text-2xl font-bold text-white flex items-center">
+                                <i class="fa-solid fa-users-viewfinder mr-3 text-indigo-500"></i>${slide.title}
+                            </h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow my-2">
+                            ${slide.members.map(m => `
+                                <div class="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80 flex flex-col justify-between hover:border-indigo-500/40 transition-all duration-300 group">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <strong class="text-base text-white font-bold">${m.role}</strong>
+                                            <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">${m.tag}</span>
+                                        </div>
+                                        <p class="text-xs md:text-sm text-gray-400 leading-relaxed font-medium">${m.desc}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (slide.type === "summary") {
+                htmlContent = `
+                    <div class="h-full flex flex-col justify-between">
+                        <div class="flex items-center justify-between border-b border-zinc-800 pb-4 mb-4">
+                            <h3 class="text-2xl font-bold text-white">${slide.title}</h3>
+                            <span class="px-3 py-1 rounded-lg text-xs font-bold bg-violet-500/10 border border-violet-500/20 text-violet-300 font-mono">${slide.badge}</span>
+                        </div>
+                        <p class="text-sm md:text-base text-gray-400 mb-6 font-medium">${slide.desc}</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-grow mb-4">
+                            ${slide.tips.map((t, index) => `
+                                <div class="bg-zinc-900/60 p-5 rounded-2xl border border-zinc-800/80 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center space-x-3 mb-3">
+                                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-mono text-sm font-bold">0${index+1}</span>
+                                            <h4 class="text-sm md:text-base font-bold text-zinc-100">${t.title}</h4>
+                                        </div>
+                                        <p class="text-xs md:text-sm text-gray-400 leading-relaxed font-medium">${t.text}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            contentContainer.innerHTML = htmlContent;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Touch (Swipe) Gestures support
+        let touchstartX = 0;
+        let touchendX = 0;
+        
+        const slideWrapper = document.getElementById('slide-wrapper');
+        
+        slideWrapper.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+        });
+
+        slideWrapper.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        });
+
+        function handleGesture() {
+            if (touchendX < touchstartX - 50) {
+                nextSlide(); // Swiped left, go next
+            }
+            if (touchendX > touchstartX + 50) {
+                prevSlide(); // Swiped right, go previous
+            }
+        }
+
+        // Initialize first slide on load
+        window.onload = function() {
+            renderSlide();
+        };
+    </script>
+</body>
+</html>
