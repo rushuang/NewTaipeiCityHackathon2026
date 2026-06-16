@@ -1,7 +1,6 @@
 # NewTaipeiCityHackathon2026
 
-Analyze topics from 2 dimensions: scope and member ability
-by Ru's Gemini
+Analyze topics from 2 dimensions: scope and member ability by Gemini
 
 ## 📌 目錄
 1. [AI 輔助不動產估價案件審查（地政局）](#1-ai-輔助不動產估價案件審查地政局)
